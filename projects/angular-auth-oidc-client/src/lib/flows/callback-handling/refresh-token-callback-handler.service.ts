@@ -41,6 +41,7 @@ export class RefreshTokenCallbackHandlerService {
         let authResult: any = new Object();
         authResult = response;
         authResult.state = callbackContext.state;
+        //authResult.id_token = response.id_token ? response.id_tokenn : this.storagePersistenceService.getIdToken();
 
         callbackContext.authResult = authResult;
         return of(callbackContext);

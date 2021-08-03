@@ -18,7 +18,7 @@ export class AuthStateService {
   }
 
   private get isAuthorized() {
-    return !!this.storagePersistenceService.getAccessToken() && !!this.storagePersistenceService.getIdToken();
+    return !!this.storagePersistenceService.getAccessToken(); // && !!this.storagePersistenceService.getIdToken();
   }
 
   constructor(
@@ -83,7 +83,7 @@ export class AuthStateService {
       return false;
     }
 
-    if (this.hasIdTokenExpired()) {
+    if (this.hasIdTokenExpiredAndRenewCheckIsEnabled()) {
       this.loggerService.logDebug('persisted id_token is expired');
       return false;
     }
@@ -97,10 +97,14 @@ export class AuthStateService {
     return true;
   }
 
-  hasIdTokenExpired() {
-    const tokenToCheck = this.storagePersistenceService.getIdToken();
-    const { renewTimeBeforeTokenExpiresInSeconds } = this.configurationProvider.getOpenIDConfiguration();
+  hasIdTokenExpiredAndRenewCheckIsEnabled() {
+    const { renewTimeBeforeTokenExpiresInSeconds, enableIdTokenExpiredValidationInRenew } = this.configurationProvider.getOpenIDConfiguration();
 
+    if (!enableIdTokenExpiredValidationInRenew) {
+      return false;
+    }
+
+    const tokenToCheck = this.storagePersistenceService.getIdToken();
     const idTokenExpired = this.tokenValidationService.hasIdTokenExpired(tokenToCheck, renewTimeBeforeTokenExpiresInSeconds);
 
     if (idTokenExpired) {

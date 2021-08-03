@@ -48,16 +48,16 @@ export class PeriodicallyTokenCheckService {
           `Checking: silentRenewRunning: ${isSilentRenewRunning} id_token: ${!!idToken} userData: ${!!userDataFromStore}`
         );
 
-        const shouldBeExecuted = userDataFromStore && !isSilentRenewRunning && idToken;
+        const shouldBeExecuted = userDataFromStore && !isSilentRenewRunning;
 
         if (!shouldBeExecuted) {
           return of(null);
         }
 
-        const idTokenHasExpired = this.authStateService.hasIdTokenExpired();
+        const idTokenStillValid = this.authStateService.hasIdTokenExpiredAndRenewCheckIsEnabled();
         const accessTokenHasExpired = this.authStateService.hasAccessTokenExpiredIfExpiryExists();
 
-        if (!idTokenHasExpired && !accessTokenHasExpired) {
+        if (!idTokenStillValid && !accessTokenHasExpired) {
           return of(null);
         }
 
